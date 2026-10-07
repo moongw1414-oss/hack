@@ -1,0 +1,32 @@
+-- ServerScriptService/WordGameDev.server.lua
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local DEVELOPERS = {
+	[Koala_Owl523] = true,
+}
+
+local remote = Instance.new("RemoteEvent")
+remote.Name = "WordGameDevRemote"
+remote.Parent = ReplicatedStorage
+
+local function isDeveloper(player)
+	return DEVELOPERS[player.UserId] == true
+end
+
+remote.OnServerEvent:Connect(function(player, action, value)
+	if not isDeveloper(player) then
+		return
+	end
+
+	if action == "RequestAccess" then
+		remote:FireClient(player, "Authorized")
+		return
+	end
+
+	if action == "DevToggle" then
+		-- 개발자 테스트 상태를 서버에서 전달
+		remote:FireClient(player, "Toggle", value)
+	end
+end)
